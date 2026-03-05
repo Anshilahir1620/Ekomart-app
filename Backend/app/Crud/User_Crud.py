@@ -1,10 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.users import User
 from app.schemas.user_schema import UserCreate, UserUpdate
-from app.core.security import verify_password
-from app.core.security import hash_password
-
-
+from app.core.security import hash_password, verify_password
 
 
 def get_all_users(db: Session):
@@ -16,10 +13,17 @@ def get_user_by_id(db: Session, user_id: int):
 
 
 def create_user(db: Session, user: UserCreate):
+    print("RAW PASSWORD:", user.password)
+    print("RAW LENGTH:", len(user.password))
+    print("IS HASH?:", user.password.startswith("$2"))
+
+    hashed = hash_password(user.password)
+    print("HASHED LENGTH:", len(hashed))
+    print("HASHED VALUE:", hashed)
     db_user = User(
         name=user.name,
         email=user.email,
-        password=hash_password(user.password),
+        password=hash_password(user.password), 
         role_id=2,
         status=1,
     )
@@ -28,8 +32,9 @@ def create_user(db: Session, user: UserCreate):
     db.refresh(db_user)
     return db_user
 
-def authenticate_user(db, email, password):
-    user = db.query(User).filter(User.email == email).first()
+
+def authenticate_user(db: Session, name: str, password: str):
+    user = db.query(User).filter(User.name == name).first()
     if not user:
         return None
 
@@ -44,8 +49,12 @@ def update_user(db: Session, user_id: int, user: UserUpdate):
     if not db_user:
         return None
 
-    for key, value in user.model_dump(exclude_unset=True).items():
-        setattr(db_user, key, value)  # no hashing
+    update_data = user.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        if key == "password":
+            value = hash_password(value)  
+        setattr(db_user, key, value)
 
     db.commit()
     db.refresh(db_user)

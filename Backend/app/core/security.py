@@ -1,22 +1,29 @@
-from datetime import datetime, timedelta
-from jose import jwt
 from passlib.context import CryptContext
+from jose import jwt
+from datetime import datetime, timedelta
 
-SECRET_KEY = "change-this-secret"
+SECRET_KEY = "5c1c50f833ee9a9883ad1de9d1ff0cd0e97f6b7ff75249ea87935b9d27bca14e"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def hash_password(password: str):
-    print("Password length:", len(password))
     return pwd_context.hash(password)
 
-def verify_password(password: str, hashed_password: str):
-    return pwd_context.verify(password, hashed_password)
+
+def verify_password(plain_password: str, hashed_password: str):
+    return pwd_context.verify(plain_password, hashed_password)
+
 
 def create_access_token(data: dict):
     to_encode = data.copy()
+
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+    return encoded_jwt

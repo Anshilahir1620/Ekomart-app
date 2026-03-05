@@ -1,11 +1,4 @@
-from sqlalchemy import (
-    Column,
-    Integer,
-    String,
-    SmallInteger,
-    TIMESTAMP,
-    text,
-)
+from sqlalchemy import (Column,Integer,String,SmallInteger,TIMESTAMP,text,)
 from app.database import Base
 
 

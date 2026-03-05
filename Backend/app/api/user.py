@@ -30,16 +30,16 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
     return create_user(db, user)
 
 
-@router.post("/login")
-def login_user(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = authenticate_user(db, user.email, user.password)
-    if not db_user:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+# @router.post("/login")
+# def login_user(user: UserLogin, db: Session = Depends(get_db)):
+#     db_user = authenticate_user(db, user.email, user.password)
+#     if not db_user:
+#         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    return {
-        "message": "Login successful",
-        "user_id": db_user.id,
-    }
+#     return {
+#         "message": "Login successful",
+#         "user_id": db_user.id,
+#     }
 
 
 @router.get("/{user_id}", response_model=UserOut)
